@@ -1,0 +1,5 @@
+"0","larva[,'FILA'] <- as.numeric(as.factor(larva$FILA))"
+"0","larva[,'COLUMNA'] <- as.numeric(as.factor(larva$COLUMNA))"
+"0","larva[,'RED'] <- as.numeric(as.factor(larva$RED))"
+"0","larva[,'GREEN'] <- as.numeric(as.factor(larva$GREEN))"
+"0","larva[,'BLUE'] <- as.numeric(as.factor(larva$BLUE))"

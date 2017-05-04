@@ -1,0 +1,4 @@
+"0","library(readr)"
+"0","larva2 <- read_csv(""~/GENER/ricardo/1. Raw Data/PSOMML_2Larvas.csv"", "
+"0","                          col_names = FALSE)"
+"0","colnames(larva2) <- c(""FILA"", ""COLUMNA"", ""RED"", ""GREEN"", ""BLUE"")"

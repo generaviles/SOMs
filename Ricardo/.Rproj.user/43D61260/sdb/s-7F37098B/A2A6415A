@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1493828973531.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "A2A6415A",
+    "lastKnownWriteTime" : 7308604914264011873,
+    "last_content_update" : 1493828973531,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "95E5EB4A",
+        "caption" : "larva2",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=larva2&cache_key=95E5EB4A",
+        "displayedObservations" : 262144,
+        "environment" : "",
+        "object" : "larva2",
+        "preview" : 0,
+        "totalObservations" : 262144,
+        "variables" : 5
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

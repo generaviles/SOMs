@@ -1,0 +1,1 @@
+"0","som_cluster <- cutree(hclust(dist(data.frame(som_model$codes))), 3)"

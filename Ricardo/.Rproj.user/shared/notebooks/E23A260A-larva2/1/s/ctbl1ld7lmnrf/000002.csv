@@ -1,0 +1,6 @@
+"0","par(mfrow = c(2,2))"
+"0","plot(som_model,"
+"0","     type = ""property"","
+"0","     property = models[,3],"
+"0","     main=names(models)[3],"
+"0","     palette.name=coolBlueHotRed)"

@@ -1,0 +1,149 @@
+---
+title: "SOM LARVA en una matriz de 60 x 60 Neuronas"
+output: html_notebook
+---
+
+#1. Loading raw data and getting it ready
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+library(readr)
+larva <- read_csv("~/GENER/ricardo/1. Raw Data/PSOMML_1Larva.csv", 
+                          col_names = TRUE)
+
+```
+
+The dataframe obtained is made of `integer` values:
+
+```{r}
+str(larva)
+```
+
+
+This will be a problem down the line when feeding this data to the algorithm, values have to be changed to  `numeric`:
+
+```{r}
+larva[,'FILA'] <- as.numeric(as.factor(larva$FILA))
+larva[,'COLUMNA'] <- as.numeric(as.factor(larva$COLUMNA))
+larva[,'RED'] <- as.numeric(as.factor(larva$RED))
+larva[,'GREEN'] <- as.numeric(as.factor(larva$GREEN))
+larva[,'BLUE'] <- as.numeric(as.factor(larva$BLUE))
+```
+
+Whit this taken care of we have a database ready to be fed to the algorithmL
+```{r}
+str(larva)
+```
+#2 Initial exploration of data
+
+A brief summary of the values of the variable can help with the initial understanding of things:
+```{r}
+summary(larva)
+```
+
+
+#3 Self Organizing Map
+
+##Loading required package
+
+```{r, message=FALSE, warning=FALSE}
+require(kohonen)
+```
+
+##Changing dataframe to a `matrix`
+```{r}
+#I removed the function scale() because it does not need to be scaled.
+larva.matrix <- as.matrix(larva)
+
+#TEST
+larva.matrixTest <- larva.matrix[1:20000,]
+```
+
+##Creating the SOM grid
+```{r}
+som_grid <- somgrid(xdim = 60, ydim = 60, topo = "rectangular")
+```
+
+
+##Training the SOM
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+som_model <- som(larva.matrix,
+                 grid = som_grid,
+                 rlen = 1500,
+                 alpha = c(0.05,0.01),
+                 keep.data = TRUE)
+```
+
+##Training progress evaluation
+```{r, message=FALSE, warning=FALSE}
+plot(som_model, type = "changes")
+```
+
+##Node counts
+```{r, fig.height= 8}
+source('coolBlueHotRed.R')
+plot(som_model, type = "counts", palette.name=coolBlueHotRed)
+```
+
+```{r, fig.height=10}
+var <- 5
+models <- as.data.frame(som_model$codes)
+plot(som_model,
+     type = "property",
+     property = models[,var],
+     main=names(models)[var],
+     palette.name=coolBlueHotRed)
+```
+
+```{r}
+#source('plotHeatMap.R')
+#plotHeatMap(som_model, data = models, variable=0)
+```
+
+
+##Neighbor Distance
+```{r, fig.align='center'}
+plot(som_model, type = "dist.neighbours", palette.name = grey.colors)
+```
+
+##Code Spread
+```{r, fig.height= 10}
+plot(som_model, type = "codes", palette.name = coolBlueHotRed)
+```
+
+##Clustering
+```{r}
+mydata <- som_model$codes 
+wss <- (nrow(mydata)-1)*sum(apply(data.frame(mydata),2,var)) 
+for (i in 2:20) {
+  wss[i] <- sum(kmeans(data.frame(mydata), centers=i)$withinss)
+}
+plot(1:20, wss, type="b", xlab="Number of Clusters",
+     ylab="Within groups sum of squares", main="Within cluster sum of squares (WCSS)")
+
+som_cluster <- cutree(hclust(dist(data.frame(som_model$codes))), 3)
+
+
+```
+
+In this graphic we can see that the ideal amount of clusters is not more than 5. Starting with 5 and going down we will choose the smallest number that gives us a smooth distribution in quantity of it's members:
+
+```{r}
+# 7 Clusters -- the first cluster has considerably less members than the other four ones.
+table(cutree(hclust(dist(data.frame(som_model$codes))), 7))
+
+
+# 5 Clusters -- the first cluster has considerably less members than the other four ones.
+table(cutree(hclust(dist(data.frame(som_model$codes))), 5))
+
+#4 clusters -- we have founde the good one.
+table(cutree(hclust(dist(data.frame(som_model$codes))), 4))
+```
+
+
+```{r, fig.height= 10}
+pretty_palette <- c("#1f77b4", '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2')
+
+plot(som_model, type="mapping", bgcol = pretty_palette[som_cluster], main = "Clusters", keepMargins = TRUE) 
+add.cluster.boundaries(som_model, som_cluster, lwd = 7)
+```
+

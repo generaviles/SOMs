@@ -1,0 +1,1 @@
+"0","plot(som_model, type = ""dist.neighbours"", palette.name = grey.colors)"

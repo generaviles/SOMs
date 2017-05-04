@@ -1,0 +1,4 @@
+"0","#I removed the function scale() because it does not need to be scaled."
+"0","larva.matrix <- as.matrix(larva)"
+"0","#TEST"
+"0","larva.matrixTest <- larva.matrix[1:20000,]"

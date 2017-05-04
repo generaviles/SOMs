@@ -1,0 +1,115 @@
+---
+title: "SOM for Ricardo's Data"
+output: html_notebook
+---
+
+#1. Loading raw data and getting it ready
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+library(readr)
+img <- read_csv("~/Documentos/GENER/ricardo/1. Raw Data/PSOMMLmini.csv", 
+    col_names = FALSE)
+colnames(img) <- c("FILA", "COLUMNA", "RED", "GREEN", "BLUE")
+```
+
+The dataframe obtained is made of `integer` values:
+
+```{r}
+str(img)
+```
+
+
+This will be a problem down the line when feeding this data to the algorithm, values have to be changed to  `numeric`:
+
+```{r}
+img[,'FILA'] <- as.numeric(as.factor(img$FILA))
+img[,'COLUMNA'] <- as.numeric(as.factor(img$COLUMNA))
+img[,'RED'] <- as.numeric(as.factor(img$RED))
+img[,'GREEN'] <- as.numeric(as.factor(img$GREEN))
+img[,'BLUE'] <- as.numeric(as.factor(img$BLUE))
+```
+
+Whit this taken care of we have a database ready to be fed to the algorithmL
+```{r}
+str(img)
+```
+#2 Initial exploration of data
+
+A brief summary of the values of the variable can help with the initial understanding of things:
+```{r}
+summary(img)
+```
+
+
+#3 Self Organizing Map
+
+##Loading required package
+
+```{r, message=FALSE, warning=FALSE}
+require(kohonen)
+```
+
+##Changing dataframe to a `matrix` and normalizing it's values
+```{r}
+#I removed the function scale() because it does not need to be scaled.
+img.matrix <- as.matrix(img)
+
+#TEST
+img.matrixTest <- img.matrix[1:20000,]
+```
+
+##Creating the SOM grid
+```{r}
+som_grid <- somgrid(xdim = 70, ydim = 70, topo = "rectangular")
+```
+
+
+##Training the SOM
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+som_model <- som(img.matrixTest,
+                 grid = som_grid,
+                 rlen = 200,
+                 alpha = c(0.05,0.01),
+                 keep.data = TRUE)
+```
+
+##Training progress evaluation
+```{r}
+plot(som_model, type = "changes")
+```
+
+##Node counts
+```{r}
+source('coolBlueHotRed.R')
+plot(som_model, type = "counts", palette.name=coolBlueHotRed)
+```
+
+##Neighbor Distance
+```{r}
+plot(som_model, type = "dist.neighbours", palette.name = grey.colors)
+```
+
+##Code Spread
+```{r}
+plot(som_model, type = "codes", palette.name = coolBlueHotRed)
+```
+
+##Clustering
+```{r}
+mydata <- som_model$codes 
+wss <- (nrow(mydata)-1)*sum(apply(data.frame(mydata),2,var)) 
+for (i in 2:15) {
+  wss[i] <- sum(kmeans(data.frame(mydata), centers=i)$withinss)
+}
+plot(wss)
+
+som_cluster <- cutree(hclust(dist(data.frame(som_model$codes))), 5)
+```
+
+```{r}
+pretty_palette <- c("#1f77b4", '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2')
+
+plot(som_model, type="mapping", bgcol = pretty_palette[som_cluster], main = "Clusters") 
+add.cluster.boundaries(som_model, som_cluster)
+```
+

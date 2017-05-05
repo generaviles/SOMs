@@ -7,9 +7,11 @@ output: html_notebook
 
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
 library(readr)
-larva2 <- read_csv("~/GENER/ricardo/1. Raw Data/PSOMML_2Larvas.csv", 
-                          col_names = FALSE)
+larva2 <- read_csv("~/GENER/SOMs/Ricardo/1. Raw Data/PSOMML_2Larvas.csv", 
+    col_names = FALSE)
 colnames(larva2) <- c("FILA", "COLUMNA", "RED", "GREEN", "BLUE")
+
+larva2 <- larva2[,-1:-2]
 
 
 ```
@@ -24,8 +26,6 @@ str(larva2)
 This will be a problem down the line when feeding this data to the algorithm, values have to be changed to  `numeric`:
 
 ```{r}
-larva2[,'FILA'] <- as.numeric(as.factor(larva2$FILA))
-larva2[,'COLUMNA'] <- as.numeric(as.factor(larva2$COLUMNA))
 larva2[,'RED'] <- as.numeric(as.factor(larva2$RED))
 larva2[,'GREEN'] <- as.numeric(as.factor(larva2$GREEN))
 larva2[,'BLUE'] <- as.numeric(as.factor(larva2$BLUE))
@@ -90,20 +90,21 @@ plot(som_model, type = "counts", palette.name=coolBlueHotRed)
 
 ```{r, fig.height=10}
 par(mfrow = c(2,2))
+models <- as.data.frame(som_model$codes)
+plot(som_model,
+     type = "property",
+     property = models[,1],
+     main=names(models)[1],
+     palette.name=coolBlueHotRed)
+plot(som_model,
+     type = "property",
+     property = models[,2],
+     main=names(models)[2],
+     palette.name=coolBlueHotRed)
 plot(som_model,
      type = "property",
      property = models[,3],
      main=names(models)[3],
-     palette.name=coolBlueHotRed)
-plot(som_model,
-     type = "property",
-     property = models[,4],
-     main=names(models)[4],
-     palette.name=coolBlueHotRed)
-plot(som_model,
-     type = "property",
-     property = models[,5],
-     main=names(models)[5],
      palette.name=coolBlueHotRed)
 
 ```

@@ -1,0 +1,7 @@
+"0","mydata <- som_model$codes "
+"0","wss <- (nrow(mydata)-1)*sum(apply(data.frame(mydata),2,var)) "
+"0","for (i in 2:20) {"
+"0","  wss[i] <- sum(kmeans(data.frame(mydata), centers=i)$withinss)"
+"0","}"
+"0","plot(1:20, wss, type=""b"", xlab=""Number of Clusters"","
+"0","     ylab=""Within groups sum of squares"", main=""Within cluster sum of squares (WCSS)"")"

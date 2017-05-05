@@ -1,0 +1,3 @@
+"0","img.matrix <- as.matrix(img)"
+"0","#TEST"
+"0","#img.matrixTest <- img.matrix[1:1000000,]"

@@ -1,0 +1,4 @@
+"0","library(readr)"
+"0","library(readr)"
+"0","img <- read_csv(""~/GENER/Gerardo/1. Raw Data/DatosDifsg.csv"")"
+"0","img <- img[,-1:-2]"

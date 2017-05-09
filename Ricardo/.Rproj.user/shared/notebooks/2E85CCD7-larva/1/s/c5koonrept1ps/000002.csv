@@ -1,2 +1,0 @@
-"0","source('coolBlueHotRed.R')"
-"0","plot(som_model, type = ""counts"", palette.name=coolBlueHotRed)"

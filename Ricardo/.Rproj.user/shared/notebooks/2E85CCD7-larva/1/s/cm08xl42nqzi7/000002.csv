@@ -1,2 +1,0 @@
-"0","#source('plotHeatMap.R')"
-"0","#plotHeatMap(som_model, data = models, variable=0)"

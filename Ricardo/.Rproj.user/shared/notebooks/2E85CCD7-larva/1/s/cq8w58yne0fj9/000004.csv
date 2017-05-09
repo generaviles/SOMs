@@ -1,7 +1,0 @@
-"0","var <- 5"
-"0","models <- as.data.frame(som_model$codes)"
-"0","plot(som_model,"
-"0","     type = ""property"","
-"0","     property = models[,var],"
-"0","     main=names(models)[var],"
-"0","     palette.name=coolBlueHotRed)"

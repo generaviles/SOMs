@@ -1,5 +1,5 @@
 ---
-title: "SOM LARVA en una matriz de 60 x 60 Neuronas"
+title: "SOM 3 LARVAS"
 output: html_notebook
 ---
 
@@ -7,37 +7,39 @@ output: html_notebook
 
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
 library(readr)
-larva <- read_csv("~/GENER/ricardo/1. Raw Data/PSOMML_1Larva.csv", 
-                          col_names = TRUE)
+larva3 <- read_csv("~/GENER/SOMs/Ricardo/1. Raw Data/PSOMML_3Larvas.csv", 
+    col_names = FALSE)
+colnames(larva3) <- c("FILA", "COLUMNA", "RED", "GREEN", "BLUE")
+
+larva3 <- larva3[,-1:-2]
+
 
 ```
 
 The dataframe obtained is made of `integer` values:
 
 ```{r}
-str(larva)
+str(larva3)
 ```
 
 
 This will be a problem down the line when feeding this data to the algorithm, values have to be changed to  `numeric`:
 
 ```{r}
-larva[,'FILA'] <- as.numeric(as.factor(larva$FILA))
-larva[,'COLUMNA'] <- as.numeric(as.factor(larva$COLUMNA))
-larva[,'RED'] <- as.numeric(as.factor(larva$RED))
-larva[,'GREEN'] <- as.numeric(as.factor(larva$GREEN))
-larva[,'BLUE'] <- as.numeric(as.factor(larva$BLUE))
+larva3[,'RED'] <- as.numeric(as.factor(larva3$RED))
+larva3[,'GREEN'] <- as.numeric(as.factor(larva3$GREEN))
+larva3[,'BLUE'] <- as.numeric(as.factor(larva3$BLUE))
 ```
 
 Whit this taken care of we have a database ready to be fed to the algorithmL
 ```{r}
-str(larva)
+str(larva3)
 ```
 #2 Initial exploration of data
 
 A brief summary of the values of the variable can help with the initial understanding of things:
 ```{r}
-summary(larva)
+summary(larva3)
 ```
 
 
@@ -52,21 +54,18 @@ require(kohonen)
 ##Changing dataframe to a `matrix`
 ```{r}
 #I removed the function scale() because it does not need to be scaled.
-larva.matrix <- as.matrix(larva)
-
-#TEST
-larva.matrixTest <- larva.matrix[1:20000,]
+larva3.matrix <- as.matrix(larva3)
 ```
 
 ##Creating the SOM grid
 ```{r}
-som_grid <- somgrid(xdim = 60, ydim = 60, topo = "rectangular")
+som_grid3 <- somgrid(xdim = 40, ydim = 40, topo = "hexagonal")
 ```
 
 
 ##Training the SOM
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
-som_model <- som(larva.matrix,
+som_model3 <- som(larva3.matrix,
                  grid = som_grid,
                  rlen = 1500,
                  alpha = c(0.05,0.01),
@@ -75,44 +74,52 @@ som_model <- som(larva.matrix,
 
 ##Training progress evaluation
 ```{r, message=FALSE, warning=FALSE}
-plot(som_model, type = "changes")
+plot(som_model3, type = "changes")
 ```
 
 ##Node counts
 ```{r, fig.height= 8}
 source('coolBlueHotRed.R')
-plot(som_model, type = "counts", palette.name=coolBlueHotRed)
+plot(som_model3, type = "counts", palette.name=coolBlueHotRed)
 ```
+
+##SOM by RGB value
 
 ```{r, fig.height=10}
-var <- 3
-models <- as.data.frame(som_model$codes)
-plot(som_model,
+par(mfrow = c(2,2))
+models3 <- as.data.frame(som_model3$codes)
+plot(som_model3,
      type = "property",
-     property = models[,var],
-     main=names(models)[var],
+     property = models3[,1],
+     main=names(models3)[1],
      palette.name=coolBlueHotRed)
-```
+plot(som_model3,
+     type = "property",
+     property = models3[,2],
+     main=names(models3)[2],
+     palette.name=coolBlueHotRed)
+plot(som_model3,
+     type = "property",
+     property = models3[,3],
+     main=names(models3)[3],
+     palette.name=coolBlueHotRed)
 
-```{r}
-#source('plotHeatMap.R')
-#plotHeatMap(som_model, data = models, variable=0)
 ```
 
 
 ##Neighbor Distance
 ```{r, fig.align='center'}
-plot(som_model, type = "dist.neighbours", palette.name = grey.colors)
+plot(som_model3, type = "dist.neighbours", palette.name = grey.colors)
 ```
 
 ##Code Spread
 ```{r, fig.height= 10}
-plot(som_model, type = "codes", palette.name = coolBlueHotRed)
+plot(som_model3, type = "codes", palette.name = coolBlueHotRed)
 ```
 
 ##Clustering
 ```{r}
-mydata <- som_model$codes 
+mydata <- som_model3$codes 
 wss <- (nrow(mydata)-1)*sum(apply(data.frame(mydata),2,var)) 
 for (i in 2:20) {
   wss[i] <- sum(kmeans(data.frame(mydata), centers=i)$withinss)
@@ -120,7 +127,7 @@ for (i in 2:20) {
 plot(1:20, wss, type="b", xlab="Number of Clusters",
      ylab="Within groups sum of squares", main="Within cluster sum of squares (WCSS)")
 
-som_cluster <- cutree(hclust(dist(data.frame(som_model$codes))), 3)
+som_cluster <- cutree(hclust(dist(data.frame(som_model3$codes))), 3)
 
 
 ```
@@ -129,21 +136,21 @@ In this graphic we can see that the ideal amount of clusters is not more than 5.
 
 ```{r}
 # 7 Clusters -- the first cluster has considerably less members than the other four ones.
-table(cutree(hclust(dist(data.frame(som_model$codes))), 7))
+table(cutree(hclust(dist(data.frame(som_model3$codes))), 3))
 
 
 # 5 Clusters -- the first cluster has considerably less members than the other four ones.
-table(cutree(hclust(dist(data.frame(som_model$codes))), 5))
+table(cutree(hclust(dist(data.frame(som_model3$codes))), 5))
 
 #4 clusters -- we have founde the good one.
-table(cutree(hclust(dist(data.frame(som_model$codes))), 4))
+table(cutree(hclust(dist(data.frame(som_model3$codes))), 4))
 ```
 
 
 ```{r, fig.height= 10}
 pretty_palette <- c("#1f77b4", '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2')
 
-plot(som_model, type="mapping", bgcol = pretty_palette[som_cluster], main = "Clusters", keepMargins = TRUE) 
-add.cluster.boundaries(som_model, som_cluster, lwd = 7)
+plot(som_model3, type="mapping", bgcol = pretty_palette[som_cluster], main = "Clusters", keepMargins = TRUE) 
+add.cluster.boundaries(som_model3, som_cluster, lwd = 7)
 ```
 

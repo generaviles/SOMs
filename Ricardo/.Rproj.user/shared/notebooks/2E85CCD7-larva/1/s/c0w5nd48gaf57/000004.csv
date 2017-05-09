@@ -1,3 +1,0 @@
-"0","library(readr)"
-"0","larva <- read_csv(""~/GENER/ricardo/1. Raw Data/PSOMML_1Larva.csv"", "
-"0","                          col_names = TRUE)"
